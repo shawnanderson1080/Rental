@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Luxury Car Rentals</title>
+  <title>Elite Rides</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
@@ -78,36 +78,56 @@
     }
   </style>
   <script>
-    // Calculate total price given a price per day based on date difference
+    // Set minimum dates for all date inputs to today's date
+    function setMinDates() {
+      const today = new Date().toISOString().split('T')[0];
+      // Booking form dates
+      document.getElementById('startDate').setAttribute('min', today);
+      document.getElementById('endDate').setAttribute('min', today);
+      // Search form dates
+      document.getElementById('searchStartDate').setAttribute('min', today);
+      document.getElementById('searchEndDate').setAttribute('min', today);
+    }
+    
+    window.onload = setMinDates;
+    
+    // Calculate total price based on price per day and date difference
     function calculateTotalPrice(pricePerDay, startDate, endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
       if (isNaN(start) || isNaN(end)) return 0;
-      // Calculate difference in days (at least 1 day)
       let daysDiff = Math.ceil((end - start) / (1000 * 3600 * 24));
       if (daysDiff < 1) daysDiff = 1;
       return daysDiff * pricePerDay;
     }
     
-    // Update total price on the booking form based on selected dates
+    // Update total price in the booking form; validate date order
     function updateBookingTotal() {
       const pricePerDay = parseFloat(document.getElementById('vehiclePrice').value);
       const startDate = document.getElementById('startDate').value;
       const endDate = document.getElementById('endDate').value;
+      
+      if (!startDate || !endDate) return;
+      
+      if (new Date(startDate) > new Date(endDate)) {
+        document.getElementById('totalPrice').innerText = "Invalid date range";
+        return;
+      }
+      
       const total = calculateTotalPrice(pricePerDay, startDate, endDate);
       document.getElementById('totalPrice').innerText = "$" + total;
     }
     
-    // Show the booking form and pre-fill vehicle details
+    // Show the booking form with pre-filled vehicle details
     function showBookingForm(vehicle, price) {
       document.getElementById('bookingForm').style.display = 'block';
       document.getElementById('vehicleName').value = vehicle;
       document.getElementById('vehiclePrice').value = price;
       updateBookingTotal();
-      window.scrollTo(0,document.body.scrollHeight);
+      window.scrollTo(0, document.body.scrollHeight);
     }
     
-    // Search availability for a given date range (assumes all vehicles are available)
+    // Search for available vehicles based on a date range and validate dates
     function searchAvailability() {
       const searchStart = document.getElementById('searchStartDate').value;
       const searchEnd = document.getElementById('searchEndDate').value;
@@ -119,11 +139,15 @@
         return;
       }
       
-      // Calculate total price for each vehicle
+      if (new Date(searchStart) > new Date(searchEnd)) {
+        resultsDiv.innerHTML = "<p>End date must be after start date.</p>";
+        return;
+      }
+      
+      // Calculate total prices for demo vehicles
       const sedanTotal = calculateTotalPrice(50, searchStart, searchEnd);
       const suvTotal = calculateTotalPrice(60, searchStart, searchEnd);
       
-      // Display results (for simplicity, we assume both vehicles are available)
       resultsDiv.innerHTML += 
         "<div class='vehicle'><h3>Luxury Sedan</h3><p>Price: $50/day</p><p>Total Price: $" + sedanTotal + "</p>" +
         "<button onclick=\"showBookingForm('Luxury Sedan', 50)\">Book Now</button></div>";
@@ -135,7 +159,7 @@
   </script>
 </head>
 <body>
-  <header>Luxury Car Rentals</header>
+  <header>Elite Rides</header>
   <div class="container">
     <!-- Vehicle Listings -->
     <div class="vehicle">
