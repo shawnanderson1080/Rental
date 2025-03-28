@@ -1,68 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rental Company</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Playfair Display', serif;
-            background-color: #C2A477; /* Darker sand */
-            color: #1B3A4B; /* Deep turquoise */
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #1E847F; /* Darker turquoise green */
-            padding: 20px;
-            font-size: 28px;
-            font-weight: bold;
-            color: white;
-        }
-        .container {
-            padding: 20px;
-        }
-        .vehicle {
-            background: #A78C5F; /* Darker sand shade */
-            padding: 15px;
-            margin: 15px auto;
-            width: 80%;
-            border-radius: 10px;
-            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
-        }
-        button {
-            padding: 12px 25px;
-            background-color: #1E847F; /* Dark turquoise */
-            border: none;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background 0.3s ease;
-        }
-        button:hover {
-            background-color: #16615B; /* Even darker turquoise */
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luxury Car Rentals</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Playfair Display', serif;
+      background-color: #C2A477; /* Darker sand */
+      color: #1B3A4B; /* Deep turquoise */
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #1E847F; /* Darker turquoise green */
+      padding: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      color: white;
+    }
+    .container {
+      padding: 20px;
+    }
+    .vehicle {
+      background: #A78C5F; /* Darker sand shade */
+      padding: 15px;
+      margin: 15px auto;
+      width: 80%;
+      border-radius: 10px;
+      box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+    }
+    button {
+      padding: 12px 25px;
+      background-color: #1E847F; /* Dark turquoise */
+      border: none;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #16615B; /* Even darker turquoise */
+    }
+    /* Booking & Search Form Styles */
+    .booking-form, .search-form {
+      background: #A78C5F; /* Darker sand shade */
+      padding: 20px;
+      margin: 20px auto;
+      width: 80%;
+      border-radius: 10px;
+      box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+    }
+    .booking-form h2, .search-form h2 {
+      margin-top: 0;
+    }
+    input, select, label {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: none;
+      font-size: 16px;
+    }
+    .submit-btn {
+      background-color: #1E847F;
+      color: white;
+      font-size: 18px;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+  </style>
+  <script>
+    // Calculate total price given a price per day based on date difference
+    function calculateTotalPrice(pricePerDay, startDate, endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      if (isNaN(start) || isNaN(end)) return 0;
+      // Calculate difference in days (at least 1 day)
+      let daysDiff = Math.ceil((end - start) / (1000 * 3600 * 24));
+      if (daysDiff < 1) daysDiff = 1;
+      return daysDiff * pricePerDay;
+    }
+    
+    // Update total price on the booking form based on selected dates
+    function updateBookingTotal() {
+      const pricePerDay = parseFloat(document.getElementById('vehiclePrice').value);
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+      const total = calculateTotalPrice(pricePerDay, startDate, endDate);
+      document.getElementById('totalPrice').innerText = "$" + total;
+    }
+    
+    // Show the booking form and pre-fill vehicle details
+    function showBookingForm(vehicle, price) {
+      document.getElementById('bookingForm').style.display = 'block';
+      document.getElementById('vehicleName').value = vehicle;
+      document.getElementById('vehiclePrice').value = price;
+      updateBookingTotal();
+      window.scrollTo(0,document.body.scrollHeight);
+    }
+    
+    // Search availability for a given date range (assumes all vehicles are available)
+    function searchAvailability() {
+      const searchStart = document.getElementById('searchStartDate').value;
+      const searchEnd = document.getElementById('searchEndDate').value;
+      const resultsDiv = document.getElementById('searchResults');
+      resultsDiv.innerHTML = "";
+      
+      if (!searchStart || !searchEnd) {
+        resultsDiv.innerHTML = "<p>Please select both start and end dates.</p>";
+        return;
+      }
+      
+      // Calculate total price for each vehicle
+      const sedanTotal = calculateTotalPrice(50, searchStart, searchEnd);
+      const suvTotal = calculateTotalPrice(60, searchStart, searchEnd);
+      
+      // Display results (for simplicity, we assume both vehicles are available)
+      resultsDiv.innerHTML += 
+        "<div class='vehicle'><h3>Luxury Sedan</h3><p>Price: $50/day</p><p>Total Price: $" + sedanTotal + "</p>" +
+        "<button onclick=\"showBookingForm('Luxury Sedan', 50)\">Book Now</button></div>";
+      
+      resultsDiv.innerHTML += 
+        "<div class='vehicle'><h3>Executive SUV</h3><p>Price: $60/day</p><p>Total Price: $" + suvTotal + "</p>" +
+        "<button onclick=\"showBookingForm('Executive SUV', 60)\">Book Now</button></div>";
+    }
+  </script>
 </head>
 <body>
-    <header>Luxury Car Rentals</header>
-    
-    <div class="container">
-        <div class="vehicle">
-            <h2>Luxury Sedan</h2>
-            <p>Price: $50/day</p>
-            <button>Book Now</button>
-        </div>
-
-        <div class="vehicle">
-            <h2>Executive SUV</h2>
-            <p>Price: $60/day</p>
-            <button>Book Now</button>
-        </div>
+  <header>Luxury Car Rentals</header>
+  <div class="container">
+    <!-- Vehicle Listings -->
+    <div class="vehicle">
+      <h2>Luxury Sedan</h2>
+      <p>Price: $50/day</p>
+      <button onclick="showBookingForm('Luxury Sedan', 50)">Book Now</button>
     </div>
+    <div class="vehicle">
+      <h2>Executive SUV</h2>
+      <p>Price: $60/day</p>
+      <button onclick="showBookingForm('Executive SUV', 60)">Book Now</button>
+    </div>
+    
+    <!-- Search Availability Section -->
+    <div class="search-form">
+      <h2>Search Availability</h2>
+      <label>Rental Start Date:</label>
+      <input type="date" id="searchStartDate" onchange="searchAvailability()">
+      <label>Rental End Date:</label>
+      <input type="date" id="searchEndDate" onchange="searchAvailability()">
+      <div id="searchResults"></div>
+    </div>
+    
+    <!-- Booking Form Section -->
+    <div class="booking-form" id="bookingForm" style="display: none;">
+      <h2>Book Your Rental</h2>
+      <form>
+        <input type="text" id="vehicleName" readonly placeholder="Vehicle" />
+        <!-- Hidden field to store price per day -->
+        <input type="hidden" id="vehiclePrice" />
+        <input type="text" placeholder="Full Name" required />
+        <input type="email" placeholder="Email Address" required />
+        <input type="tel" placeholder="Phone Number" required />
+        <input type="text" placeholder="Driver's License Number" required />
+        <label>Rental Start Date:</label>
+        <input type="date" id="startDate" onchange="updateBookingTotal()" required />
+        <label>Rental End Date:</label>
+        <input type="date" id="endDate" onchange="updateBookingTotal()" required />
+        <p>Total Price: <span id="totalPrice">$0</span></p>
+        <button type="submit" class="submit-btn">Submit Booking</button>
+      </form>
+    </div>
+  </div>
 </body>
 </html>
